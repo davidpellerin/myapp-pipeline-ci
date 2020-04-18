@@ -2,6 +2,7 @@ version: 0.2
 phases:
   build:
     commands:
+      - echo "$CODEBUILD_BUILD_ID"
       - tar -zcvf s3.tar.gz s3.yml
       - tar -zcvf sqs.tar.gz sqs.yml
       - aws s3 cp ./ s3://dpellerin-pipeline-storage/ --recursive --exclude "*" --include "*.tar.gz"
