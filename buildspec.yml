@@ -5,4 +5,4 @@ env:
 phases:
   build:
     commands:
-      - aws s3 cp ./ s3://dpellerin-pipeline-storage/ --recursive --exclude "*" --include "cfn/*.yml"
+      - aws s3 cp ./cfn/ s3://dpellerin-pipeline-storage/ --exclude "*" --include "*.yml"
