@@ -1,18 +1,6 @@
 version: 0.2
 phases:
-  install:
-    runtime-versions:
-        nodejs: 10
-  pre_build:
+  build:
     commands:
       - tar -zcvf s3-0.1.1.tar.gz s3.yml
       - aws s3 cp s3-0.1.1.tar.gz s3://dpellerin-pipeline-storage
-  build:
-    commands:
-      - pwd
-      - ls -la
-artifacts:
-  type: zip
-  files:
-    - s3.yml
-
