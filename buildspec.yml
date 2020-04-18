@@ -1,7 +1,4 @@
 version: 0.2
-env:
-  parameter-store:
-    OXR_APP_ID: "/staging/OXR_APP_ID"
 phases:
   build:
     commands:
