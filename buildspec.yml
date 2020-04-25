@@ -6,6 +6,7 @@ phases:
       python: 3.8
     commands:
       - gem install cfn-nag
+      - pip install --upgrade pip
       - pip install cfn-lint
   build:
     commands:
