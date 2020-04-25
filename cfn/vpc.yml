@@ -174,13 +174,22 @@ Resources:
     Properties:
       GroupDescription: "Security group with no ingress rule"
       VpcId: !Ref VPC
-  AllPortsEgress:
+  AllTcpPortsEgress:
     Type: AWS::EC2::SecurityGroupEgress
     Properties:
-      Description: 'Allow all traffic outbound'
+      Description: 'Allow all TCP traffic outbound'
       GroupId: !Ref NoIngressSecurityGroup
       CidrIp: '0.0.0.0/0'
-      IpProtocol: '-1'
+      IpProtocol: 'tcp'
+      FromPort: -1
+      ToPort: -1
+  AllUdpPortsEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      Description: 'Allow all UDP traffic outbound'
+      GroupId: !Ref NoIngressSecurityGroup
+      CidrIp: '0.0.0.0/0'
+      IpProtocol: 'udp'
       FromPort: -1
       ToPort: -1
 
