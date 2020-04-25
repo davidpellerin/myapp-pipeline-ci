@@ -13,6 +13,15 @@ Resources:
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
       Policies:
+        - PolicyName: "DeleteIgw"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: "DeleteIgw"
+                Effect: "Allow"
+                Action:
+                  - "ec2:DeleteInternetGateway"
+                Resource: "arn:aws:ec2:*:*:internet-gateway/*"
         - PolicyName: "ManageVpc"
           PolicyDocument:
             Version: "2012-10-17"
@@ -26,7 +35,6 @@ Resources:
                   - "ec2:DeleteSubnet"
                   - "ec2:DescribeInternetGateways"
                   - "ec2:DetachInternetGateway"
-                  - "ec2:DeleteInternetGateway"
                   - "ec2:DeleteVpc"
                 Resource: "*"
         - PolicyName: "XrayPutTracePolicy"
