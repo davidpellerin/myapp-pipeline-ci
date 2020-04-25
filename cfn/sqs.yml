@@ -6,5 +6,5 @@ Resources:
   MyQueue:
     Type: AWS::SQS::Queue
     Properties:
-      QueueName:
-        !Ref QueueName
+      KmsMasterKeyId: 'alias/aws/sqs'
+      QueueName: !Ref QueueName
