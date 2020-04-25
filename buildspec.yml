@@ -1,5 +1,11 @@
 version: 0.2
 phases:
+  install:
+    runtime-versions:
+      ruby: 2.6
+    commands:
+      - gem install cfn-nag
   build:
     commands:
+      - cfn_nag_scan --input-path /cfn
       - aws s3 cp ./cfn/ s3://dpellerin-pipeline-storage/ --recursive --exclude "*" --include "*.yml"

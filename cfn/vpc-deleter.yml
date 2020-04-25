@@ -1,0 +1,105 @@
+Resources:
+  CfnDeleteDefaultVpcLambdaRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "lambda.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Path: "/base/service-role/"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      Policies:
+        - PolicyName: "ManageVpc"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: "ManageVpc"
+                Effect: "Allow"
+                Action:
+                  - "ec2:DescribeRegions"
+                  - "ec2:DescribeVpcs"
+                  - "ec2:DescribeSubnets"
+                  - "ec2:DeleteSubnet"
+                  - "ec2:DescribeInternetGateways"
+                  - "ec2:DetachInternetGateway"
+                  - "ec2:DeleteInternetGateway"
+                  - "ec2:DeleteVpc"
+                Resource: "*"
+        - PolicyName: "XrayPutTracePolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: "XRayPutTraceSegments"
+                Effect: "Allow"
+                Action:
+                  - "xray:PutTraceSegments"
+                Resource: "*"
+  CfnDeleteDefaultVpcLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: "/aws/lambda/CfnDeleteDefaultVpc"
+      RetentionInDays: 30
+  CfnDeleteDefaultVpcLambda:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      Handler: "index.handler"
+      FunctionName: "CfnDeleteDefaultVpc"
+      Runtime: "python3.7"
+      Role: !GetAtt "CfnDeleteDefaultVpcLambdaRole.Arn"
+      Timeout: 600
+      Code:
+        ZipFile: |
+          import boto3
+          import cfnresponse
+          import logging
+          import os
+          logger = logging.getLogger()
+          logger.setLevel(logging.INFO)
+          def handler(event, context):
+              try:
+                  logger.info('REQUEST EVENT:\n %s', event)
+                  op = event['RequestType']
+                  if (op == 'Update' or op == 'Create'):
+                      ec2 = boto3.client('ec2', region_name=os.environ['AWS_REGION'])
+                      region_response = ec2.describe_regions(AllRegions=False, DryRun=False)
+                      regions = [region['RegionName'] for region in region_response['Regions']]
+                      print('Regions:', regions)
+                      for region in regions:
+                          print('Region:', region)
+                          ec2 = boto3.client('ec2', region_name=region)
+                          response = ec2.describe_vpcs(Filters=[{'Name': 'isDefault', 'Values': ['true']}], DryRun=False)
+                          vpcs = [vpc['VpcId'] for vpc in response['Vpcs']]
+                          print('VPCs:', vpcs)
+                          for vpc in vpcs:
+                              response = ec2.describe_subnets(Filters=[{'Name': 'vpc-id', 'Values': [vpc]}], DryRun=False)
+                              subnets = [subnet['SubnetId'] for subnet in response['Subnets']]
+                              print('Subnets:', subnets)
+                              for subnet in subnets:
+                                  print('Deleting Subnet: ' + subnet)
+                                  response = ec2.delete_subnet(SubnetId=subnet)
+                                  print(response)
+                              response = ec2.describe_internet_gateways(Filters=[{'Name': 'attachment.vpc-id', 'Values': [vpc]}], DryRun=False)
+                              igws = [igw['InternetGatewayId'] for igw in response['InternetGateways']]
+                              print('IGWs:', igws)
+                              for igw in igws:
+                                  print('Detaching IGW: ' + igw)
+                                  response = ec2.detach_internet_gateway(InternetGatewayId=igw, VpcId=vpc)
+                                  print(response)
+                                  print('Deleting IGW: ' + igw)
+                                  response = ec2.delete_internet_gateway(InternetGatewayId=igw)
+                                  print(response)
+                              print('Deleting VPC: ' + vpc)
+                              response = ec2.delete_vpc(VpcId=vpc)
+                              print(response)
+                      cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData="{'reason': 'Deleted default VPCs'}")
+                      print('')
+                  elif (op == 'Delete'):
+                      cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData="{'reason': 'Delete is a NOOP'}")
+                  else:
+                      cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData="{'reason': 'ERROR: Unknown operation.'}")
+              except Exception as e:
+                  print('Exception: ' + str(e))
