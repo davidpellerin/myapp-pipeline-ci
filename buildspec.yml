@@ -3,9 +3,12 @@ phases:
   install:
     runtime-versions:
       ruby: 2.6
+      python: 3.8
     commands:
       - gem install cfn-nag
+      - pip install cfn-lint
   build:
     commands:
+      - cfn-lint ./cfn/*.yml
       - cfn_nag_scan --output-format txt --input-path ./cfn
       - aws s3 cp ./cfn/ s3://dpellerin-pipeline-storage/ --recursive --exclude "*" --include "*.yml"
