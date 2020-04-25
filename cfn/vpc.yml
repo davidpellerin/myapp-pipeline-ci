@@ -177,6 +177,7 @@ Resources:
   AllPortsEgress:
     Type: AWS::EC2::SecurityGroupEgress
     Properties:
+      Description: 'Allow all traffic outbound'
       GroupId: !Ref NoIngressSecurityGroup
       CidrIp: '0.0.0.0/0'
       IpProtocol: '-1'
