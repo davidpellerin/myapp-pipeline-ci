@@ -7,7 +7,5 @@ phases:
       - gem install cfn-nag
   build:
     commands:
-      - ls -la
-      - cfn_nag_scan --help
-      - cfn_nag_scan --input-path ./cfn
+      - cfn_nag_scan --output-format txt --input-path ./cfn
       - aws s3 cp ./cfn/ s3://dpellerin-pipeline-storage/ --recursive --exclude "*" --include "*.yml"
