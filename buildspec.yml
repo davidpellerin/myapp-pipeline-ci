@@ -15,3 +15,4 @@ phases:
       - cfn_nag_scan --output-format txt --input-path ./cfn
       - tar -vczf "myapp-ci-$CODEBUILD_BUILD_NUMBER.zip" ./cfn/*.yml
       - aws s3 cp "myapp-ci-$CODEBUILD_BUILD_NUMBER.zip" s3://dpellerin-pipeline-storage/
+      - aws s3 cp "myapp-ci-$CODEBUILD_BUILD_NUMBER.zip" s3://dpellerin-pipeline-storage/latest.zip
