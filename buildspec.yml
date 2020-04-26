@@ -12,4 +12,5 @@ phases:
     commands:
       - cfn-lint ./cfn/*.yml
       - cfn_nag_scan --output-format txt --input-path ./cfn
-      - aws s3 cp ./cfn/ s3://dpellerin-pipeline-storage/ --recursive --exclude "*" --include "*.yml"
+      - tar -vczf myapp-ci-$CODEBUILD_BUILD_ID.zip ./cfn/*.yml
+      - aws s3 cp myapp-ci-$CODEBUILD_BUILD_ID.zip s3://dpellerin-pipeline-storage/ --recursive --exclude "*" --include "*.yml"
