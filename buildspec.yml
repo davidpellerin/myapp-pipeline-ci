@@ -13,6 +13,6 @@ phases:
       - echo Build started on `date` and CODEBUILD_BUILD_NUMBER is $CODEBUILD_BUILD_NUMBER
       - cfn-lint ./cfn/*.yml
       - cfn_nag_scan --output-format txt --input-path ./cfn
-      - tar -vczf "myapp-ci-$CODEBUILD_BUILD_NUMBER.zip" ./cfn/*.yml
-      - aws s3 cp "myapp-ci-$CODEBUILD_BUILD_NUMBER.zip" s3://dpellerin-pipeline-storage/
-      - aws s3 cp "myapp-ci-$CODEBUILD_BUILD_NUMBER.zip" s3://dpellerin-pipeline-storage/latest.zip
+      - tar -vczf "myapp-ci-$CODEBUILD_BUILD_NUMBER.tar.gz" ./cfn/*.yml
+      - aws s3 cp "myapp-ci-$CODEBUILD_BUILD_NUMBER.tar.gz" s3://dpellerin-pipeline-storage/
+      - aws s3 cp "myapp-ci-$CODEBUILD_BUILD_NUMBER.tar.gz" s3://dpellerin-pipeline-storage/latest.tar.gz
