@@ -10,7 +10,7 @@ phases:
       - pip install cfn-lint
   build:
     commands:
-      - echo Build started on `date` and CODEBUILD_BUILD_ID is $CODEBUILD_BUILD_ID
+      - echo Build started on `date` and CODEBUILD_BUILD_NUMBER is $CODEBUILD_BUILD_NUMBER
       - cfn-lint ./cfn/*.yml
       - cfn_nag_scan --output-format txt --input-path ./cfn
       - tar -vczf "myapp-ci-$CODEBUILD_BUILD_ID.zip" ./cfn/*.yml
